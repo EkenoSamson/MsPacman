@@ -1,8 +1,9 @@
 import gymnasium as gym
 import ale_py
 from feature_engineer import FeatureEngineer
-from agent import Agent  # We reuse our Agent class
+from agent import Agent
 import time
+import argparse # For command-line arguments
 
 # --- 1. Register Environment ---
 gym.register_envs(ale_py)
@@ -11,26 +12,23 @@ gym.register_envs(ale_py)
 NUM_EPISODES = 10         # How many games to watch
 Q_TABLE_FILE = "q_table.pkl" # The "brain" we trained
 
-def main():
+def main(args):
     # --- 3. Initialization ---
     
-    # !! THIS IS THE CORRECTED LINE !!
-    # Changed "MsPacMan" to "MsPacman" (lowercase 'm')
+    seed = args.seed
+    
+    # render_mode="human" IS KEY HERE. This opens the window.
     env = gym.make("ALE/MsPacman-v5", render_mode="human", obs_type="ram")
     
     num_actions = env.action_space.n
     
     fe = FeatureEngineer()
     
-    # We initialize the agent, but the learning parameters
-    # don't matter since we won't be training.
+    # Learning parameters don't matter, but Epsilon=0 is critical
     agent = Agent(
         action_space_n=num_actions,
-        alpha=0,
-        gamma=0,
-        epsilon=0, # <-- CRITICAL: Set Epsilon to 0
-        epsilon_min=0,
-        epsilon_decay=0
+        alpha=0, gamma=0, epsilon=0,
+        epsilon_min=0, epsilon_decay=0
     )
     
     # --- 4. Load the Trained Brain ---
@@ -44,12 +42,13 @@ def main():
 
     print("--- Starting Evaluation ---")
     print(f"Loading trained agent from {Q_TABLE_FILE}")
-    print(f"Running for {NUM_EPISODES} episodes with Epsilon=0 (100% exploitation).")
+    print(f"Running for {NUM_EPISODES} episodes with Epsilon=0 and Seed: {seed}.")
 
     # --- 5. The Evaluation Loop ---
     for episode in range(NUM_EPISODES):
         
-        (obs, info) = env.reset()
+        # Seed the reset for reproducible evaluations
+        (obs, info) = env.reset(seed=seed + episode)
         state = fe.get_state(obs)
         
         total_reward = 0
@@ -87,4 +86,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Evaluate a trained Q-Learning agent.")
+    parser.add_argument("--seed", type=int, default=1337, help="Random seed for evaluation.")
+    args = parser.parse_args()
+    main(args)

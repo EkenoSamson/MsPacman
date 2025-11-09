@@ -13,11 +13,11 @@ class Agent:
         
         Parameters:
         - action_space_n: The number of possible actions (e.g., 9 for Ms. Pac-Man)
-        - alpha: The learning rate (e.g., 0.1)
-        - gamma: The discount factor (e.g., 0.99)
-        - epsilon: The initial exploration rate (e.g., 1.0)
-        - epsilon_min: The minimum exploration rate (e.g., 0.01)
-        - epsilon_decay: The rate at which epsilon decays (e.g., 0.999)
+        - alpha: The learning rate
+        - gamma: The discount factor
+        - epsilon: The initial exploration rate
+        - epsilon_min: The minimum exploration rate
+        - epsilon_decay: The rate at which epsilon decays
         """
         self.action_space_n = action_space_n
         self.alpha = alpha
@@ -27,7 +27,7 @@ class Agent:
         self.epsilon_decay = epsilon_decay
         
         # The Q-Table is a dictionary where:
-        # Key = state tuple (e.g., (3, 2, 56))
+        # Key = state tuple (e.g., (3, 2, 56, 1))
         # Value = a list of Q-values for each action [Q(s, a0), Q(s, a1), ...]
         self.q_table = {}
 
@@ -57,9 +57,7 @@ class Agent:
     def update(self, state, action, reward, next_state, terminated):
         """
         Implements the Q-Learning update rule.
-        This is the core of the learning algorithm.
         
-        The Bellman Equation (Q-Learning update):
         Q(s, a) <- Q(s, a) + alpha * (r + gamma * max(Q(s', a')) - Q(s, a))
         """
         
@@ -67,7 +65,6 @@ class Agent:
         current_q = self.get_q_table(state)[action]
         
         # 2. Get the max future Q-value: max(Q(s', a'))
-        # If the game is over (terminated), the future value is 0.
         max_future_q = 0.0
         if not terminated:
             max_future_q = np.max(self.get_q_table(next_state))
@@ -83,8 +80,7 @@ class Agent:
 
     def decay_epsilon(self):
         """
-        Reduces the exploration rate (epsilon) over time,
-        so the agent exploits more as it learns.
+        Reduces the exploration rate (epsilon) over time.
         """
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay

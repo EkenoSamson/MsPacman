@@ -4,28 +4,35 @@ from feature_engineer import FeatureEngineer
 from agent import Agent
 import time
 import numpy as np
-import pickle # <-- 1. IMPORT PICKLE
+import pickle
+import argparse  # For command-line arguments
+import random
 
 # --- 1. Register Environment ---
 gym.register_envs(ale_py)
 
 # --- 2. Hyperparameters ---
-NUM_EPISODES = 50000      # 50000 was great after trying 10000
+NUM_EPISODES = 50000      # Set to 50000 for full run
 LEARNING_RATE = 0.1       # alpha
 DISCOUNT_FACTOR = 0.99    # gamma
 EPSILON = 1.0             # Initial exploration rate
 EPSILON_MIN = 0.01        # Minimum exploration rate
-EPSILON_DECAY = 0.9999    # You might need 0.99995 for 50k episodes
+EPSILON_DECAY = 0.9999    # Decay rate
 SAVE_EVERY = 500          # Save the Q-Table every 500 episodes
 
 # Filepaths for saving/loading
 Q_TABLE_FILE = "q_table.pkl"
-REWARDS_FILE = "rewards.pkl" # NEW FILE FOR REWARDS
+DATA_FILE = "training_data.pkl" # Will store rewards AND epsilons
 
-def main():
+def main(args):
     # --- 3. Initialization ---
-    env = gym.make("ALE/MsPacman-v5", obs_type="ram") # No render for speed
     
+    # --- Set the Seed (for rubric) ---
+    seed = args.seed
+    random.seed(seed)
+    np.random.seed(seed)
+    
+    env = gym.make("ALE/MsPacman-v5", obs_type="ram")
     num_actions = env.action_space.n
     
     fe = FeatureEngineer()
@@ -39,14 +46,16 @@ def main():
     )
     
     print("--- Starting Training ---")
-    print(f"Running for {NUM_EPISODES} episodes.")
+    print(f"Running for {NUM_EPISODES} episodes with Seed: {seed}")
     
-    episode_rewards = [] # This list will be saved
+    episode_rewards = []
+    epsilon_values = [] # List to store epsilon values
 
     # --- 4. The Main Training Loop ---
     for episode in range(NUM_EPISODES):
         
-        (obs, info) = env.reset()
+        # Seed the reset for reproducibility
+        (obs, info) = env.reset(seed=seed + episode)
         state = fe.get_state(obs)
         
         total_reward = 0
@@ -64,6 +73,7 @@ def main():
         # --- End of Episode ---
         agent.decay_epsilon()
         episode_rewards.append(total_reward)
+        epsilon_values.append(agent.epsilon) # Store current epsilon
         
         # --- Logging ---
         if (episode + 1) % 100 == 0:
@@ -80,12 +90,18 @@ def main():
     env.close()
     agent.save_q_table(Q_TABLE_FILE) # Final save
     
-    # --- 3. SAVE THE REWARDS LIST ---
-    with open(REWARDS_FILE, 'wb') as f:
-        pickle.dump(episode_rewards, f)
+    # --- Save the Data for Plotting ---
+    training_data = {
+        "rewards": episode_rewards,
+        "epsilons": epsilon_values
+    }
+    with open(DATA_FILE, 'wb') as f:
+        pickle.dump(training_data, f)
         
-    print(f"--- Training Finished. Rewards saved to {REWARDS_FILE} ---")
-
+    print(f"--- Training Finished. Data saved to {DATA_FILE} ---")
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Train a Q-Learning agent for Ms. Pac-Man.")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility.")
+    args = parser.parse_args()
+    main(args)

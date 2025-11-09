@@ -4,7 +4,7 @@ class FeatureEngineer:
     """
     Transforms the 128-byte RAM into a simple state for our agent.
     
-    Our new state is a 4-feature tuple:
+    Our state is a 4-feature tuple:
     1. (f1) Binned distance to the nearest ghost (to AVOID)
     2. (f2) Binned distance to the fruit (to PURSUE)
     3. (f3) Player's current direction (for context)
