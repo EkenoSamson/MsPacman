@@ -8,33 +8,14 @@ This project was developed in Python using `gymnasium` and the Arcade Learning E
 
 The agent was trained over multiple 50,000-episode runs. The final 4-feature model (`q_table.pkl`) is included in this repository.
 
-### Agent Performance
-
-The agent's performance is highly sensitive to the initial random seed, demonstrating the classic challenge of "local optima" in reinforcement learning.
-
-* **Bad Seed:** The agent learns a suboptimal "hiding" policy and scores **~70 points**.
-* **Good Seed:** The agent learns a robust "pellet-seeking" policy and achieves an average score of **~500-700+ points**.
 
 Below is a video of the trained agent (from a successful run) playing with 100% exploitation (no random moves).
 
-<video src="https://github.com/user/repo/blob/main/videos/eval-seed-1337-episode-9.mp4" controls="controls" style="max-width: 720px;">
+<video src="https://github.com/EkenoSamson/MsPacman/blob/main/videos/eval-seed-1337-episode-9.mp4" controls="controls" style="max-width: 720px;">
   Your browser does not support the video tag.
 </video>
 
-*(Note: You must upload this project to a GitHub repository and replace the `github.com/user/repo/blob/main` URL with your own repository's URL for the video to embed correctly.)*
 
-### Training Analysis
-
-The agent's policy was learned over 50,000 episodes. The graph below shows the 100-episode moving average reward vs. the exploration rate ($\epsilon$) during one of the training runs.
-
-![Agent Training Performance](training_performance.png)
-
-## Project Goal
-
-The primary goal was to solve the Ms. Pac-Man environment using classic Q-Learning. This was an iterative process:
-
-1.  **Model 1 (3-Features):** A baseline model `(GhostDist, FruitDist, PlayerDir)` was created. This model **failed**, as it learned to hide in a corner ("state blindness").
-2.  **Model 2 (4-Features):** A new feature, `DotsEatenBin`, was added to incentivize progress. This model was **successful**, but its success was found to be highly sensitive to the initial random seed.
 
 ## File Structure
 
@@ -78,7 +59,7 @@ After running, you can find the `.mp4` files in the `videos` directory.
 
 ### 3. Train from Scratch (Full Run)
 
-If you want to re-run the 50,000-episode training, use the `train.py` script. This will **overwrite** the existing `q_table.pkl` and `training_data.pkl` files and will take several hours.
+If you want to re-run the training, use the `train.py` script. This will **overwrite** the existing `q_table.pkl` and `training_data.pkl` files and will take several hours.
 
 ```bash
 # Run the full training (this takes a long time)
