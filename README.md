@@ -11,10 +11,9 @@ The agent was trained over multiple 50,000-episode runs. The final 4-feature mod
 
 Below is a video of the trained agent (from a successful run) playing with 100% exploitation (no random moves).
 
-<video src="https://github.com/EkenoSamson/MsPacman/blob/main/videos/eval-seed-1337-episode-9.mp4" controls="controls" style="max-width: 720px;">
+<video src="https://github.com/EkenoSamson/MsPacman/raw/main/videos/eval-seed-1337-episode-9.mp4" controls="controls" style="max-width: 720px;">
   Your browser does not support the video tag.
 </video>
-
 
 
 ## File Structure
